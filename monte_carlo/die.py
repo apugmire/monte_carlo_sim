@@ -168,26 +168,72 @@ class Analyzer():
         Takes no parameters. Computes how many times each face is rolled in each event. Returns a dataframe where the 
         index is the roll number, the columns are the face values, and cells are the count values.
         '''
-        # get list of all possible faces to use a column
-        all_faces = np.unique(np.concatenate([self.die.faces for piece in self.game.pieces]))
+        # get list of all possible faces to use as columns
+        all_faces = np.unique(np.concatenate([piece.faces for piece in self.game.pieces]))
         
         #create base dataframe with roll number as index and possible faces as columns
-        counts = pd.DataFrame(index=self.game._play_results.index, columns = all_faces).fillna(0)
+        face_counts = pd.DataFrame(index=self.game._play_results.index, columns = all_faces).fillna(0)
         
-        #irterate over rolls and get counts of each face
+        #iterate over rolls and get counts of each face
         for roll in self.game._play_results.index:
         
             # isolate each row
-            outcomes = self.game._playe_results.loc[roll].values
+            outcomes = self.game._play_results.loc[roll].values
             
             # count occurance of each face and store in a dictionary where the face is the key and the count is the value
             counts = {face:(outcomes==face).sum() for face in all_faces}
             
             #add counts to data frame
-            for face, count in count.items():
-                count.loc[roll_num,face] = count
-        return counts
+            for face, count in counts.items():
+                face_counts.loc[roll,face] = count
+                
+        return face_counts
     
     def combo_count(self):
+        '''
+        Takes no parameters. Computes the distinct combinations of faces rolled, along with their counts. The combinations
+        are order-independent and repetition is allowed. Returns a data frame with a MultiIndex of distinct combinations and
+        a column for the associated counts
+        '''
+        
+        #get the faces from each roll and sort since order does not matter (ex. AAB and ABA are the same)
+        faces_rolled = [np.sort(self.game._play_results.loc[roll].values) for roll in self.game._play_results.index]
+        
+        #convert each face outcome to a tuple for easier counting
+        tupes = [tuple(faces) for faces in faces_rolled]
+        
+        #count how many times each face combo appears and store that in a dictionary 
+        count = {tupe:tupes.count(tupe) for tupe in tupes}
+        
+        #create multiindex
+        index = pd.MultiIndex.from_tuples(count.keys(), names = [i for i in range(len(next(iter(count))))])
+        
+        #create datafram with multiindex and column with counts
+        combo_counts = pd.DataFrame({'Count': list(count.values())}, index=index)
+        combo_counts = combo_counts.sort_index()
+        
+        return combo_counts
     
     def perm_count(self):
+        '''
+        Takes no parameters. Computes the distinct permutations of faces rolled, along with their counts. The permutations
+        are order-dependent and repetition is allowed. Returns a data frame with a MultiIndex of distinct permutations and a
+        column for the associated counts
+        '''
+        #get the faces from each roll, no sorting since order matters
+        faces_rolled = [self.game._play_results.loc[roll].values for roll in self.game._play_results.index]
+        
+        #convert each face outcome to a tuple for easier counting
+        tupes = [tuple(faces) for faces in faces_rolled]
+        
+        #count how many times each face combo appears and store that in a dictionary 
+        count = {tupe:tupes.count(tupe) for tupe in tupes}
+        
+        #create multiindex
+        index = pd.MultiIndex.from_tuples(count.keys(), names = [i for i in range(len(next(iter(count))))])
+        
+        #create datafram with multiindex and column with counts
+        perm_counts = pd.DataFrame({'Count': list(count.values())}, index=index)
+        perm_counts = perm_counts.sort_index()
+        
+        return perm_counts
