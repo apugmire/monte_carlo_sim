@@ -1,5 +1,6 @@
 import pandas as pd
 import numpy as np
+import itertools
 
 class Die():
     '''
@@ -56,7 +57,7 @@ class Die():
         return [np.random.choice(self._die.index, replace = True, p=prob) for i in range(rolls)]
             
     def current_state(self):
-        '''Takes no arguments and returns a copy of the private die data frame'''
+        '''Takes no arguments and returns a copy of the private die data frame at this point in time'''
         
         copy = self._die.copy()
         
