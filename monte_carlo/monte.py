@@ -5,7 +5,7 @@ import itertools
 class Die():
     '''
     This class provides methods for creating a rolling a dice. For this class, a die is any discrete random variable 
-    associated with a stochastic process.
+    associated with a stochastic process. 
     
     Attributes:
     
@@ -29,8 +29,9 @@ class Die():
         self._die.index.name = "Faces"
         
     def change_weight(self,face,weight):
-        '''changes the weight of one face if that face is on the die and the weight is a valid value (must be an integer
-        or float).
+        '''
+        Takes an integer or float parameter and changes the weight of one face if that face is on the die and the weight is 
+        a valid value. Will attempt to cast the provided parameter to a float if possible.
         '''
         
         #check if provided value is a face
@@ -57,7 +58,7 @@ class Die():
         return [np.random.choice(self._die.index, replace = True, p=prob) for i in range(rolls)]
             
     def current_state(self):
-        '''Takes no arguments and returns a copy of the private die data frame at this point in time'''
+        '''Takes no arguments and returns a copy of the die at this point in time'''
         
         copy = self._die.copy()
         
@@ -78,17 +79,19 @@ class Game():
     '''
     
     def __init__(self,pieces):
-        '''initialize the list of die/dice to be used in the game'''
+        '''initialize the list of die/dice to be used in the game.'''
         
         self.pieces = pieces
         
     def play_game(self, rolls):
-        '''takes an integer parameter to specify how many times the dice should be rolled and saves the result of the
-        roll(s) in a wide format data frame'''
+        '''
+        takes an integer parameter to specify how many times the dice should be rolled and saves the result of the
+        roll(s) in a wide format data frame. Does not return anything but changes the object's state.
+        '''
         
         # roll each dice in the list and store the results in a dictionary 
         # where the key is the position in the list and the value is the list of results
-        outcome = {self.pieces.index(piece): piece.roll_die(rolls) for piece in self.pieces}
+        outcome = {i: self.pieces[i].roll_die(rolls) for i in range(len(self.pieces))}
         
         # convert dictionary into a dataframe where the column names are the list index 
         # and the row names are the roll number
@@ -98,7 +101,7 @@ class Game():
         
     def show_outcome(self, form="wide"):
         '''
-        takes a string parameter (either "wide" or "narrow") and returns a copy of the private play data frame to the user 
+        takes a string parameter (either "wide" or "narrow") and returns a copy of game outcome to the user 
         in either wide or narrow form.
         
         The narrow form will have a MultiIndex, comprising the roll number and the die number and a single column with the 
@@ -133,8 +136,7 @@ class Game():
 
 class Analyzer():
     '''
-    This class provides methods for analyzing the results of a single game. These methods require a game from the Game 
-    class. This class takes the results of a single game and computes various descriptive statistical properties about it.
+    This class provides methods for analyzing the results of a single game. These methods require a game from the Game class. This class takes the results of a single game and computes various descriptive statistical properties about it.
 
     Attributes:
     
