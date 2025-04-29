@@ -31,7 +31,8 @@ class Die():
     def change_weight(self,face,weight):
         '''
         Takes an integer or float parameter and changes the weight of one face if that face is on the die and the weight is 
-        a valid value. Will attempt to cast the provided parameter to a float if possible.
+        a valid value. Will attempt to cast the provided parameter to a float if possible. Changes the state of the Die
+        object.
         '''
         
         #check if provided value is a face
